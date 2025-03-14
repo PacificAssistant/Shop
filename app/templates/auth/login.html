@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <title>Вхід</title>
+</head>
+<body>
+    <h2>Вхід</h2>
+    <form method="POST">
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Пароль" required>
+        <button type="submit">Увійти</button>
+    </form>
+    <a href="{{ url_for('auth.register') }}">Немає акаунту? Зареєструватися</a>
+</body>
+</html

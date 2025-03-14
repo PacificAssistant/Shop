@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Товар {{ product_id }}{% endblock %}
+
+{% block content %}
+    <link href="{{ url_for('static', filename='css/product.css') }}" rel="stylesheet">
+
+
+
+    <div class="container-product" style="width: 90%;min-height: 100vh;margin-left: 10%;  ">
+        <div class="photo product">
+            <img src="{{ url_for('static', filename=product.image) }}">
+
+
+        </div>
+        <div class="info">
+            <div class="title">
+                {{ product.name }}
+            </div>
+            <div class="details">
+                <div>{{product.description}}
+                </div>
+                <div>{{ product.price }}</div>
+                <div>{{product.category}}</div>
+            </div>
+        </div>
+        <div class="description">{{product.description}} Need more column</div>
+    </div>
+
+
+{% endblock %}

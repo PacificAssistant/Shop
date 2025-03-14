@@ -1,0 +1,25 @@
+.custom-btn {
+    position: fixed; /* Фіксує кнопку на екрані */
+    width: 50px; /* Фіксована ширина */
+    height: 40px; /* Фіксована висота */
+    top: 20px; /* Відступ від верху */
+    left: 20px; /* Відступ від правого краю */
+    background-color: #007bff; /* Колір фону */
+    border: none; /* Видалення рамки */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+}
+
+.custom-btn .lines {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* Відстань між лініями */
+}
+
+.custom-btn .lines div {
+    width: 25px; /* Довжина ліній */
+    height: 3px; /* Товщина ліній */
+    background-color: white; /* Колір ліній */
+}

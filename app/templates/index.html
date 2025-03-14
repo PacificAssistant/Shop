@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Головна сторінка
+    <img src="{{ url_for('static', filename='image/image.jpg') }}" alt="My Image">
+{% endblock %}
+
+{% block content %}
+    <div style="margin-left: 10%;">
+
+        <div class="product-grid" id="productGrid">
+            {% for name, image,id in products %}
+                <a href="/product/{{ id }}" class="product">
+                    <div>
+                        <img src="{{ url_for('static', filename=image) }}" alt="{{ name }}">
+
+                    </div>
+                    <div>
+                        <p>{{ name }}</p>
+                    </div>
+                </a>
+
+            {% endfor %}
+        </div>
+    </div>
+
+
+{% endblock %}

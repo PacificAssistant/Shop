@@ -1,0 +1,32 @@
+<header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom"
+        style="background-color: #161937 !important;margin-bottom: 0!important;border-bottom: 0!important;  ">
+    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none"
+       style="color: white !important;margin-left: 10%;">
+        <svg class="bi me-2" width="40" height="32">
+            <use xlink:href="#bootstrap"></use>
+        </svg>
+        <span class="fs-4">Simple header</span>
+    </a>
+
+    <ul class="nav nav-pills">
+        <li class="nav-item"><a href="{{ url_for('main.home') }}" class="nav-link active" aria-current="page">Home</a></li>
+        {% if current_user.is_authenticated %}
+            {% if current_user.is_admin %}
+                <li class="nav-item">
+                    <a href="{{ url_for('admin.dashboard') }}" class="nav-link">Admin</a>
+                </li>
+            {% endif %}
+            <li class="nav-item">
+                <a href="{{ url_for('auth.logout') }}" class="nav-link">Exit Profile</a>
+            </li>
+        {% else %}
+            <li class="nav-item">
+                <a href="{{ url_for('auth.login') }}" class="nav-link">Login</a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('auth.register') }}" class="nav-link">Register</a>
+            </li>
+        {% endif %}
+    </ul>
+
+</header>
