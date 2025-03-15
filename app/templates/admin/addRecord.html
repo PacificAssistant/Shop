@@ -1,0 +1,42 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Add product{% endblock %}
+
+{% block head %}
+    <link href="{{ url_for('static', filename='css/admin.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+    <h2>Додати продукт</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {{ product_form.hidden_tag() }}
+
+        <p>{{ product_form.name.label }} {{ product_form.name() }}</p>
+        <p>{{ product_form.price.label }} {{ product_form.price() }}</p>
+        <p>{{ product_form.image.label }} {{ product_form.image() }}</p>
+        <p>{{ product_form.description.label }} {{ product_form.description() }}</p>
+        <p>{{ product_form.stock.label }} {{ product_form.stock() }}</p>
+        <p>
+            {{ product_form.category.label }}
+            <select id="category-select" name="category">
+                {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </p>
+        <p>{{ product_form.submit() }}</p>
+    </form>
+
+    <h2>Створити нову категорію</h2>
+    <form method="POST">
+        {{ category_form.hidden_tag() }}
+        <p>{{ category_form.name.label }} {{ category_form.name() }}</p>
+        <p>{{ category_form.submit() }}</p>
+    </form>
+{% endblock %}
+
+
+
+
+

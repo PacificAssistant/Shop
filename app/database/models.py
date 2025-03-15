@@ -8,20 +8,18 @@ from app import db, login_manager
 class User(db.Model, UserMixin):
     __tablename__ = "users"
 
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(256), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    username: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    password_hash: Mapped[str] = mapped_column(String(256), nullable=False)
+    is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    orders = db.relationship("Order", back_populates="customer")
+    orders: Mapped[list["Order"]] = relationship("Order", back_populates="customer")
 
     def set_password(self, password):
-        """Hash password before saving."""
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
-        """Check if password is correct."""
         return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
@@ -29,52 +27,64 @@ class User(db.Model, UserMixin):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return db.session.get(User, int(user_id))  # Flask-SQLAlchemy gives db.session
+    return db.session.get(User, int(user_id))
+
+
+class Category(db.Model):
+    __tablename__ = "categories"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+
+    products = relationship("Product", back_populates="category")
+
+    def __repr__(self):
+        return f"<Category {self.name}>"
 
 
 class Product(db.Model):
     __tablename__ = "products"
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    price = db.Column(db.Float, nullable=False)
-    image = db.Column(db.String(255), nullable=True, default="default.jpg")
-    description = db.Column(db.Text, nullable=True)
-    stock = db.Column(db.Integer, nullable=False, default=0)
-    category = db.Column(db.String(50), nullable=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    price: Mapped[float] = mapped_column(Integer, nullable=False)
+    image: Mapped[str] = mapped_column(String(255), nullable=True, default="default.jpg")
+    description: Mapped[str] = mapped_column(String, nullable=True)
+    stock: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
+    category_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"), nullable=True)
+    category = relationship("Category", back_populates="products")
 
     def __repr__(self):
         return f"<Product {self.name} - {self.price} грн>"
 
-
 class Order(db.Model):
     __tablename__ = "orders"
 
-    id = db.Column(db.Integer, primary_key=True)
-    order_number = db.Column(db.String(20), unique=True, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    total_price = db.Column(db.Float, nullable=False)
-    status = db.Column(db.String(20), default="Очікує оплату")
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    order_number: Mapped[str] = mapped_column(String(20), unique=True, nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    total_price: Mapped[float] = mapped_column(Float, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), default="Очікує оплату")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    customer = db.relationship("User", back_populates="orders")
-    items = db.relationship("OrderItem", back_populates="order")
+    customer: Mapped["User"] = relationship("User", back_populates="orders")
+    items: Mapped[list["OrderItem"]] = relationship("OrderItem", back_populates="order")
 
     def __repr__(self):
         return f"<Order {self.order_number} - {self.status}>"
 
-
 class OrderItem(db.Model):
     __tablename__ = "order_items"
 
-    id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey("orders.id"), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False, default=1)
-    price = db.Column(db.Float, nullable=False)  # Store price at purchase time
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"), nullable=False)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), nullable=False)
+    quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    price: Mapped[float] = mapped_column(Float, nullable=False)
 
-    order = db.relationship("Order", back_populates="items")
-    product = db.relationship("Product")
+    order: Mapped["Order"] = relationship("Order", back_populates="items")
+    product: Mapped["Product"] = relationship("Product")
 
     def __repr__(self):
         return f"<OrderItem {self.product.name} x {self.quantity}>"
