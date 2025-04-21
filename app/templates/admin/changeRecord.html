@@ -1,0 +1,37 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Редагування продукту{% endblock %}
+
+{% block head %}
+    <link href="{{ url_for('static', filename='css/admin.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+    <h2>Редагування продукту</h2>
+
+    <form id="editProductForm">
+        <label for="productSelect">Оберіть продукт:</label>
+        <select id="productSelect" name="product_id">
+            {% for product in products %}
+                <option value="{{ product.id }}">{{ product.name }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="name">Назва:</label>
+        <input type="text" id="name" name="name">
+
+        <label for="price">Ціна:</label>
+        <input type="number" id="price" name="price">
+
+        <label for="stock">Кількість:</label>
+        <input type="number" id="stock" name="stock">
+
+        <label for="description">Опис:</label>
+        <textarea id="description" name="description"></textarea>
+
+        <button type="button" onclick="updateProduct()">Зберегти</button>
+    </form>
+
+
+{% endblock %}
