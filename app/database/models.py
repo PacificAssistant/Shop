@@ -4,11 +4,12 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from datetime import datetime
 from flask_login import UserMixin
 from app import db, login_manager
+from uuid import uuid4
 
 class User(db.Model, UserMixin):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
     username: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(256), nullable=False)
@@ -27,13 +28,13 @@ class User(db.Model, UserMixin):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return db.session.get(User, int(user_id))
+    return db.session.get(User, user_id)
 
 
 class Category(db.Model):
     __tablename__ = "categories"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
 
     products = relationship("Product", back_populates="category")
@@ -45,25 +46,35 @@ class Category(db.Model):
 class Product(db.Model):
     __tablename__ = "products"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     price: Mapped[float] = mapped_column(Integer, nullable=False)
     image: Mapped[str] = mapped_column(String(255), nullable=True, default="default.jpg")
     description: Mapped[str] = mapped_column(String, nullable=True)
     stock: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
-    category_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"), nullable=True)
+    category_id: Mapped[str] = mapped_column(String(36), ForeignKey("categories.id"), nullable=True)
     category = relationship("Category", back_populates="products")
 
     def __repr__(self):
         return f"<Product {self.name} - {self.price} грн>"
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "price": self.price,
+            "image": self.image,
+            "description": self.description,
+            "category_id": self.category_id,
+        }
+
 class Order(db.Model):
     __tablename__ = "orders"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
     order_number: Mapped[str] = mapped_column(String(20), unique=True, nullable=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False)
     total_price: Mapped[float] = mapped_column(Float, nullable=False)
     status: Mapped[str] = mapped_column(String(20), default="Очікує оплату")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
@@ -77,9 +88,9 @@ class Order(db.Model):
 class OrderItem(db.Model):
     __tablename__ = "order_items"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"), nullable=False)
-    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), nullable=False)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    order_id: Mapped[str] = mapped_column(ForeignKey("orders.id"), nullable=False)
+    product_id: Mapped[str] = mapped_column(ForeignKey("products.id"), nullable=False)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     price: Mapped[float] = mapped_column(Float, nullable=False)
 

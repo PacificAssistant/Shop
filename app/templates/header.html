@@ -9,7 +9,9 @@
     </a>
 
     <ul class="nav nav-pills">
-        <li class="nav-item"><a href="{{ url_for('main.home') }}" class="nav-link active" aria-current="page">Home</a></li>
+        <li class="nav-item"><a href="{{ url_for('main.home') }}" class="nav-link active" aria-current="page">Home</a>
+        </li>
+
         {% if current_user.is_authenticated %}
             {% if current_user.is_admin %}
                 <li class="nav-item">
@@ -23,10 +25,17 @@
             <li class="nav-item">
                 <a href="{{ url_for('auth.login') }}" class="nav-link">Login</a>
             </li>
+
             <li class="nav-item">
                 <a href="{{ url_for('auth.register') }}" class="nav-link">Register</a>
             </li>
+
+
         {% endif %}
+
+        <li class="nav-item">
+            {% include 'card.html' %}
+        </li>
     </ul>
 
 </header>

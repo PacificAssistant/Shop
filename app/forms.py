@@ -17,3 +17,4 @@ class ProductForm(FlaskForm):
 class CategoryForm(FlaskForm):
     name = StringField("Назва категорії", validators=[DataRequired(), Length(min=2, max=50)])
     submit = SubmitField("Додати категорію")
+

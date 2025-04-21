@@ -1,35 +1,56 @@
-from flask import Blueprint, render_template, request
-from flask_login import login_required
-from app import db
-import random
-from app.database.models import Product, Category
+import os
+from flask import render_template, request, jsonify, redirect, url_for, flash,Blueprint
+from werkzeug.utils import secure_filename
+
 from app.wraps import admin_required
 from app.forms import ProductForm, CategoryForm
-from flask import flash ,redirect, url_for
-from werkzeug.utils import secure_filename
-import os
+from app.admin.admin_class import ProductService,CategoryService
 from app.config import Config
 
-
-
 admin = Blueprint("admin", __name__)
-@admin.route("/test")
+@admin.route("/changeRecord", methods=["GET", "POST"])
 @admin_required
-def test():
-    try:
-        products = Product.query.all()
-        for i, product in enumerate(products, start=1):
-            if product.category_id is None:
-                product.category_id = 1
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        print(f"Помилка: {e}")
-    finally:
-        db.session.close()
-        return "This is a test response"
+def change_record():
+    products = ProductService.get_all_products()
+    return render_template("admin/changeRecord.html", products=products)
 
 
+@admin.route("/get_product/<int:product_id>")
+@admin_required
+def get_product(product_id):
+    product = ProductService.get_product_by_id(product_id)
+    if product:
+        return jsonify({
+            "name": product.name,
+            "price": product.price,
+            "stock": product.stock,
+            "description": product.description
+        })
+    return jsonify({"error": "Продукт не знайдено"}), 404
+
+
+@admin.route("/update_product", methods=["POST"])
+@admin_required
+def update_product():
+    product_id = request.form.get("product_id")
+    name = request.form.get("name")
+    price = request.form.get("price")
+    stock = request.form.get("stock")
+    description = request.form.get("description")
+
+    product = ProductService.update_product(product_id, name, price, stock, description)
+
+    if product:
+        return jsonify({"message": "Продукт оновлено!"})
+
+    return jsonify({"error": "Помилка оновлення"}), 400
+
+
+@admin.route("/test3")
+@admin_required
+def test_one():
+    ProductService.bulk_add_products()
+    return "This is a test response"
 
 
 @admin.route("/dashboard")
@@ -52,32 +73,22 @@ def add_record():
                 image_filename = secure_filename(product_form.image.data.filename)
 
                 UPLOAD_FOLDER = Config.UPLOAD_FOLDER
-
-                # Створюємо повний шлях для збереження
                 image_path = os.path.join(UPLOAD_FOLDER, image_filename)
 
-                # Створюємо папку, якщо її немає
                 if not os.path.exists(UPLOAD_FOLDER):
-                    print("Створюю папку:", UPLOAD_FOLDER)
                     os.makedirs(UPLOAD_FOLDER)
-                print("Файл для збереження:", image_filename)
-                print(product_form.image)
 
-                # Зберігаємо файл
                 product_form.image.data.save(image_path)
-                print(image_path)
-
-                # Записуємо правильний шлях у базу (відносно static/)
                 saved_image_path = f"image/{image_filename}"
 
             except Exception as e:
-                print("Помилка при збереженні файлу:", e)
                 flash("Помилка при збереженні файлу.", "error")
+                saved_image_path = "image/default.jpg"
 
         else:
-            saved_image_path = "image/default.jpg"  # Якщо немає файлу, ставимо заглушку
+            saved_image_path = "image/default.jpg"
 
-        product = Product(
+        ProductService.add_product(
             name=product_form.name.data,
             price=product_form.price.data,
             image=saved_image_path,
@@ -86,22 +97,18 @@ def add_record():
             category_id=product_form.category.data
         )
 
-        db.session.add(product)
-        db.session.commit()
         flash("Продукт додано успішно!", "success")
         return redirect(url_for("admin.add_record"))
 
     if category_form.submit.data and category_form.validate_on_submit():
-        existing_category = Category.query.filter_by(name=category_form.name.data).first()
-        if existing_category:
-            flash("Така категорія вже існує!", "danger")
-        else:
-            new_category = Category(name=category_form.name.data)
-            db.session.add(new_category)
-            db.session.commit()
+        category = CategoryService.add_category(category_form.name.data)
+        if category:
             flash("Категорію успішно додано!", "success")
+        else:
+            flash("Така категорія вже існує!", "danger")
 
         return redirect(url_for("admin.add_record"))
-    categories = Category.query.all()
+
+    categories = CategoryService.get_all_categories()
     return render_template("admin/addRecord.html", product_form=product_form, category_form=category_form,
                            categories=categories)

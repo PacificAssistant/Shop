@@ -1,14 +1,36 @@
-body {
-    text-align: center;
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* Відступ для контенту, щоб його не перекривав navbar */
+body {
+    padding-top: 70px;
+    display: block;
+    background-color: #f8f9fa;
+}
+
+/* Центруємо форму */
+.form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 70px); /* Враховуємо висоту navbar */
+}
+
+/* Стилі форми */
 form {
     display: flex;
     flex-direction: column;
     max-width: 400px;
-    margin: auto;
-}
-
-label, input, textarea, button {
-    margin-bottom: 10px;
+    width: 100%;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    background-color: white;
 }

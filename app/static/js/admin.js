@@ -19,3 +19,25 @@ document.getElementById("category-form").addEventListener("submit", function (ev
             }
         });
 });
+document.getElementById("productSelect").addEventListener("change", function () {
+    let productId = this.value;
+    fetch(`/admin/get_product/${productId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("name").value = data.name;
+            document.getElementById("price").value = data.price;
+            document.getElementById("stock").value = data.stock;
+            document.getElementById("description").value = data.description;
+        });
+});
+
+function updateProduct() {
+    let formData = new FormData(document.getElementById("editProductForm"));
+    fetch("/admin/update_product", {
+        method: "POST",
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => alert(data.message))
+        .catch(error => alert("Помилка оновлення"));
+}

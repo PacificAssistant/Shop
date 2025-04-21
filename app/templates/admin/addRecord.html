@@ -8,7 +8,15 @@
 {% endblock %}
 
 {% block content %}
-    <h2>Додати продукт</h2>
+    <div>
+        <h2>Виберіть категорію</h2>
+        <select id="category-select" class="form-select">
+            <option value="all">Усі товари</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
     <form method="POST" enctype="multipart/form-data">
         {{ product_form.hidden_tag() }}
 

@@ -1,10 +1,14 @@
 {% extends "base.html" %}
 
 {% block title %}Головна сторінка
-    <img src="{{ url_for('static', filename='image/image.jpg') }}" alt="My Image">
+
+{% endblock %}
+{% block head %}
+{#        <img src="{{ url_for('static', filename='image/image.jpg') }}" alt="My Image">#}
 {% endblock %}
 
 {% block content %}
+    <h1>Test</h1>
     <div style="margin-left: 10%;">
 
         <div class="product-grid" id="productGrid">
